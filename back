@@ -1,0 +1,486 @@
+Usuario.java
+package com.dh.mascotas.persistence.entities;
+
+import javax.persistence.*;
+
+@Entity
+public class Usuario {
+
+   @Id
+   @GeneratedValue(strategy = GenerationType.SEQUENCE)
+   private String nombre;
+   @Column
+   private String apellido;
+   @Column
+   private String email;
+   @Column
+   private int telefono;
+   @Column
+   private String password;
+
+   public Integer getID() { 
+     return id;
+}
+
+   public void setId(Integer id) { 
+    this.id = id; 
+}
+
+   public String getNombre() {
+         return nombre;
+}
+
+ public void setNombre(String nombre) {
+        this.nombre = nombre;
+}
+
+ public String getApellido() {
+         return apellido;
+}
+
+ public void setApellido(String apellido) {
+        this.apellido = apellido;
+}
+
+
+  public String getMail() {
+         return mail;
+}
+
+  public void setMail(String mail) {
+        this.mail = mail;
+}
+
+
+public int getTelefono() {
+         return telefono;
+}
+
+ public void setTelefono(int telefono) {
+         return telefono;
+}
+
+ public String getPassword() {
+         return password;
+}
+
+ public void setPassword(String password) {
+        this.password = password;
+}
+
+ 
+public Usuario(Integer id, String nombre, String apellido, String mail, int telefono, String password){
+    this.id = id;
+    this.nombre = nombre;
+    this.apellido = apellido; 
+    this.mail = mail; 
+    this.telefono = telefono;
+    this.password = password; 
+
+
+
+Perfil.java
+package com.dh.mascotas.persistence.entities;
+
+import javax.persistence.*;
+
+@Entity
+public class Perfil {
+
+   @Id
+   @GeneratedValue(strategy = GenerationType.SEQUENCE)
+   private String nombre;
+   @Column
+   private String genero;
+   @Column
+   private int cumpleaños;
+
+
+
+    public Integer getID() { return id; }
+
+  public void setId(Integer id) { this.id = id; }
+
+  public String getNombre() {
+         return nombre;
+}
+
+  public void setNombre(String nombre) {
+        this.nombre = nombre;
+}
+
+
+   public String getGenero() {
+         return nombre;
+}
+
+ public void setGenero(String genero) {
+        this.genero = genero;
+}
+
+
+public int getCumpleaños() {
+         return cumpleaños;
+}
+
+ public void setCumpleaños(String cumpleaños) {
+         return nombre;
+}
+ 
+public Perfil(String nombre, String genero, int cumpleaños){
+    this.nombre = nombre; 
+    this.genero = genero;
+    this.cumpleaños = cumpleaños;
+
+}
+
+Producto.java
+package com.dh.mascotas.persistence.entities
+
+
+import javax.persistence.*;
+
+@Entity
+public class Producto {
+
+   @Id
+   @GeneratedValue(strategy = GenerationType.SEQUENCE)
+   private String Libro;
+   @Column
+   private String genero;
+  @Column
+  private String Autor;
+   @Column
+   private int año;
+
+    public Integer getID() { return id; }
+
+  public void setId(Integer id) { this.id = id; }
+
+  public String getLibro() {
+         return libro;
+}
+
+  public void setLibro(String libro) {
+        this.libro = libro;
+}
+
+
+   public String getGenero() {
+         return genero;
+}
+
+ public void setGenero(String genero) {
+        this.genero = genero;
+}
+
+   public String getAutor() {
+         return autor;
+}
+
+ public void setAutor(String autor) {
+        this.autor = autor;
+
+
+public int getAño() {
+         return año;
+}
+
+ public void setAño(String año) {
+         return año;
+}
+ 
+public Producto(Integer id, String mail, String nombre, int cumpleaños){
+    this.id = id;
+    this.libro = libro; 
+    this.genero = genero;
+    this.autor = autor;
+    this.año = año;
+
+
+}
+
+
+
+UsuarioRepository.java
+package com.dh.mascotas.persistence.repository;
+
+import com.dh.mascotas.persistence.entities.Usuario;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
+}
+
+ProductoRepository.java
+package com.dh.mascotas.persistence.repository;
+
+import com.dh.mascotas.persistence.entities.Producto;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProductoRepository extends JpaRepository<Producto, Integer> {
+}
+
+PerfilRepository.java
+package com.dh.mascotas.persistence.repository;
+
+import com.dh.mascotas.persistence.entities.Perfil;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PerfilRepository extends JpaRepository<Perfil,Integer> {
+}
+
+
+
+
+UsuarioControler.java
+package com.dh.mascotas.controller;
+
+
+import com.dh.mascotas.persistence.entities.Usuario;
+import com.dh.mascotas.service.EjemploService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+//Mediante la anotacion RestController me permite tratar la clase como un controller,
+// de tio REST, de esta manera, me permite crear los RequestMapping y poder realizar los POST y GET.
+@RestController
+//mediante la anotacion RequestMapping indicamos el nombre del endpoint principal
+//de esta manera, al intentar realizar un POST o un GET debemos realizar la peticion
+//dando como parametro "/movimientos". Tener en cuenta esto para utilizar en PostMan
+@RequestMapping("/movimientos")
+public class UsuarioController {
+
+    //Mediante la anotacion Autowired, delegamos la creacion de las propiedades declaradas
+    //De esta manera no necesitamos crear un objeto de tipo EjemploService.
+    @Autowired
+    UsuarioService service;
+
+    // creamos el primer metodo POST. De esta manera, al entrar por el endpoint "/crear" llamamos
+    //al metodo "crear" y ejecutamos su contenido. Tener en cuenta cuando lo usemos en PostMan
+    //En este caso el metodo crear toma como parametro un objeto de tipo Usuario y lo
+    //agrega a la base de datos.
+    @PostMapping("/crear")
+    public ResponseEntity<String> crear(@RequestBody Usuario pe){
+        ResponseEntity<String> respuesta = null;
+
+        if(service.save(pe) != null){
+            respuesta = ResponseEntity.ok(body:"El Usuario fue registrado con éxito");
+        }else{
+     respuesta = ResponseEntity.internalServerError().body(t: "Ooops");
+        }
+
+        return respuesta;
+    }
+
+    // creamos el segundo metodo GET. De esta manera, al entrar por el endpoint "/todos" ejecutamos
+    //al metodo "consultarTodos" y ejecutamos su contenido. Tener en cuenta cuando lo usemos en PostMan
+    //En este caso el metodo consultarTodos no toma ningnu parametro. Retorno TODOS los objetos de tipo
+    //Usuario que tengamos en la base de datos. Digamos, todos los productos
+    //que hayamos creado y agregado en la base de datos, este metodo los retornara.
+    @GetMapping("/todos")
+    public ResponseEntity<List<Usuario>> consultarTodos(){
+
+        return ResponseEntity.ok(service.obtenerTodos());
+    }
+}
+
+PerfilController.java
+package com.dh.mascotas.controller;
+
+
+import com.dh.mascotas.persistence.entities.Perfil;
+import com.dh.mascotas.service.EjemploService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+//Mediante la anotacion RestController me permite tratar la clase como un controller,
+// de tio REST, de esta manera, me permite crear los RequestMapping y poder realizar los POST y GET.
+@RestController
+//mediante la anotacion RequestMapping indicamos el nombre del endpoint principal
+//de esta manera, al intentar realizar un POST o un GET debemos realizar la peticion
+//dando como parametro "/movimientos". Tener en cuenta esto para utilizar en PostMan
+@RequestMapping("/movimientos")
+public class PerfilController {
+
+    //Mediante la anotacion Autowired, delegamos la creacion de las propiedades declaradas
+    //De esta manera no necesitamos crear un objeto de tipo EjemploService.
+    @Autowired
+    PerfilService service;
+
+    // creamos el primer metodo POST. De esta manera, al entrar por el endpoint "/crear" llamamos
+    //al metodo "crear" y ejecutamos su contenido. Tener en cuenta cuando lo usemos en PostMan
+    //En este caso el metodo crear toma como parametro un objeto de tipo Perfil y lo
+    //agrega a la base de datos.
+    @PostMapping("/crear")
+    public ResponseEntity<String> crear(@RequestBody Perfil pe){
+        ResponseEntity<String> respuesta = null;
+
+        if(service.save(pe) != null){
+            respuesta = ResponseEntity.ok(body:"El Perfil fue registrado con éxito");
+        }else{
+     respuesta = ResponseEntity.internalServerError().body(t: "Ooops");
+        }
+
+        return respuesta;
+    }
+
+    // creamos el segundo metodo GET. De esta manera, al entrar por el endpoint "/todos" ejecutamos
+    //al metodo "consultarTodos" y ejecutamos su contenido. Tener en cuenta cuando lo usemos en PostMan
+    //En este caso el metodo consultarTodos no toma ningnu parametro. Retorno TODOS los objetos de tipo
+    //Perfil que tengamos en la base de datos. Digamos, todos los productos
+    //que hayamos creado y agregado en la base de datos, este metodo los retornara.
+    @GetMapping("/todos")
+    public ResponseEntity<List<Perfil>> consultarTodos(){
+
+        return ResponseEntity.ok(service.obtenerTodos());
+    }
+}
+
+
+ProductoController.java
+package com.dh.mascotas.controller;
+
+
+import com.dh.mascotas.persistence.entities.Producto;
+import com.dh.mascotas.service.EjemploService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+//Mediante la anotacion RestController me permite tratar la clase como un controller,
+// de tio REST, de esta manera, me permite crear los RequestMapping y poder realizar los POST y GET.
+@RestController
+//mediante la anotacion RequestMapping indicamos el nombre del endpoint principal
+//de esta manera, al intentar realizar un POST o un GET debemos realizar la peticion
+//dando como parametro "/movimientos". Tener en cuenta esto para utilizar en PostMan
+@RequestMapping("/movimientos")
+public class ProductoController {
+
+    //Mediante la anotacion Autowired, delegamos la creacion de las propiedades declaradas
+    //De esta manera no necesitamos crear un objeto de tipo EjemploService.
+    @Autowired
+    ProductoService service;
+
+    // creamos el primer metodo POST. De esta manera, al entrar por el endpoint "/crear" llamamos
+    //al metodo "crear" y ejecutamos su contenido. Tener en cuenta cuando lo usemos en PostMan
+    //En este caso el metodo crear toma como parametro un objeto de tipo Producto y lo
+    //agrega a la base de datos.
+    @PostMapping("/crear")
+    public ResponseEntity<String> crear(@RequestBody Producto pe){
+        ResponseEntity<String> respuesta = null;
+
+        if(service.save(pe) != null){
+            respuesta = ResponseEntity.ok(body:"El producto fue agregado al carrito");
+        }else{
+     respuesta = ResponseEntity.internalServerError().body(t: "Ooops");
+        }
+
+        return respuesta;
+    }
+
+    // creamos el segundo metodo GET. De esta manera, al entrar por el endpoint "/todos" ejecutamos
+    //al metodo "consultarTodos" y ejecutamos su contenido. Tener en cuenta cuando lo usemos en PostMan
+    //En este caso el metodo consultarTodos no toma ningnu parametro. Retorno TODOS los objetos de tipo
+    //Producto que tengamos en la base de datos. Digamos, todos los productos
+    //que hayamos creado y agregado en la base de datos, este metodo los retornara.
+    @GetMapping("/todos")
+    public ResponseEntity<List<Producto>> consultarTodos(){
+
+        return ResponseEntity.ok(service.obtenerTodos());
+    }
+}
+
+
+UsuarioService.java
+package com.dh.mascotas.service;
+
+import com.dh.mascotas.persistence.entities.Usuario;
+import com.dh.mascotas.persistence.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class UsuarioService {
+
+    @Autowired
+    UsuarioRepository repository;
+
+    public String save(Usuario m){
+        if(repository.save(m) != null){
+            return "OK";
+        }else{
+            return null;
+        }
+    }
+
+    public List<Usuario> obtenerTodos(){
+        return repository.findAll();
+    }
+
+}
+
+PerfilService.java
+package com.dh.mascotas.service;
+
+import com.dh.mascotas.persistence.entities.Perfil;
+import com.dh.mascotas.persistence.repository.PerfilRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class PerfilService {
+
+    @Autowired
+    PerfilRepository repository;
+
+    public String save(Perfil m){
+        if(repository.save(m) != null){
+            return "OK";
+        }else{
+            return null;
+        }
+    }
+
+    public List<Perfil> obtenerTodos(){
+        return repository.findAll();
+    }
+
+}
+ProductoService.java
+package com.dh.mascotas.service;
+
+import com.dh.mascotas.persistence.entities.Producto;
+import com.dh.mascotas.persistence.repository.ProductoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class ProductoService {
+
+    @Autowired
+    ProductoRepository repository;
+
+    public String save(Producto m){
+        if(repository.save(m) != null){
+            return "OK";
+        }else{
+            return null;
+        }
+    }
+
+    public List<Producto> obtenerTodos(){
+        return repository.findAll();
+    }
+
+}
